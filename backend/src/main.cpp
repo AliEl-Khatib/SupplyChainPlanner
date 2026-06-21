@@ -5,6 +5,7 @@
 #include "Route.h"
 #include "SupplyChainNetwork.h"
 #include "Dijkstra.h"
+#include "api.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -16,10 +17,10 @@ int main() {
     Store s1("Store A", "Vancouver");
 
     // Set up neighbors
-    f1.addNeighbor(&w1);   // factory sends to warehouse
-    w1.addNeighbor(&f1);   // warehouse can request from factory
-    w1.addNeighbor(&s1);   // warehouse sends to store
-    s1.addNeighbor(&w1);   // store orders from warehouse
+    f1.addNeighbor(&w1);
+    w1.addNeighbor(&f1);
+    w1.addNeighbor(&s1);
+    s1.addNeighbor(&w1);
 
     // Set store demand
     s1.setDemand("widgets", 20);
@@ -47,15 +48,15 @@ int main() {
     w1.startSimulation();
     s1.startSimulation();
 
-    // Let it run for 20 seconds
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    // Start API (blocks here, runs forever)
+    startAPI(network);
 
-    // Stop simulation
+    // Stop simulation (called when API shuts down)
     std::cout << "\n=== Stopping Simulation ===" << std::endl;
-    // Stop in reverse dependency order
     s1.stopSimulation();
     w1.stopSimulation();
-    f1.stopSimulation(); 
+    f1.stopSimulation();
+
     // Print final state
     std::cout << "\n=== Final State ===" << std::endl;
     f1.display();

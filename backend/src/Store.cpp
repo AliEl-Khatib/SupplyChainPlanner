@@ -7,16 +7,14 @@ int Store::nextId = 1;
 Store::Store(std::string name, std::string location)
     : Node("S" + std::to_string(nextId++), name, location) {}
 
-std::unordered_map<std::string, int> Store::getInventory() const {
-    return inventory;
-}
 
 std::unordered_map<std::string, int> Store::getDemand() const {
     return demand;
 }
 
 bool Store::checkInventory(std::string product, int units) const {
-    return inventory.count(product) && inventory.at(product) >= units;
+    std::unordered_map<std::string, int> inv = getInventory();
+    return inv.count(product) && inv.at(product) >= units;
 }
 
 bool Store::placeOrder(std::string product, int units) {
@@ -39,7 +37,7 @@ bool Store::placeOrder(std::string product, int units) {
 void Store::display() const {
     std::cout << "Id: " << getId() << " | Name: " << getName() << " | Location: " << getLocation() << std::endl;
     std::cout << "Inventory:" << std::endl;
-    for (const auto& item : inventory) {
+    for (const auto& item : getInventory()) {
         std::cout << "  " << item.first << ": " << item.second << std::endl;
     }
     std::cout << "Demand:" << std::endl;
@@ -53,16 +51,16 @@ void Store::simulate()
     while (getRunning()) {
         std::cout << "Store checking inventory" << std::endl;
         for (const auto& [product, units] : demand) {
-            int inventoryUnits = inventory[product];
+            int inventoryUnits = getInventory()[product];
             if (inventoryUnits < units) {
                 placeOrder(product, units - inventoryUnits);
                 Message shipment = receiveMessage();
                 if (!getRunning() && shipment.type.empty()) break;
                 if (shipment.type == "SHIPMENT") {
-                    inventory[shipment.product] += shipment.units;
+                    addToInventory(shipment.product, shipment.units);
                 }
             } else {
-                inventory[product] -= units;
+                takeFromInventory(product, units);
             }
         }
         std::this_thread::sleep_for(std::chrono::seconds(5));

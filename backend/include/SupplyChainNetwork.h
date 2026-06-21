@@ -13,8 +13,10 @@ private:
 public:
     SupplyChainNetwork();
     std::unordered_map<std::string, Node*> getNodes() const;
+    std::unordered_map<std::string, Route*> getRoutes() const;
     void addNode(Node* node);
     void addRoute(Route* route);
+
     Node* findNode(std::string id) const;
     void display() const;
     std::vector<Route*> getRoutesFrom(std::string nodeId) const;

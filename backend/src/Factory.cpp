@@ -18,14 +18,10 @@ double Factory::getProductionRate() const {
     return productionRate;
 }
 
-std::unordered_map<std::string, int> Factory::getInventory() const {
-    return inventory;
-}
-
 void Factory::display() const {
     std::cout << "Id: " << getId() << " | Name: " << getName() << " | Location: " << getLocation() << " | Capacity: " << capacity << " | ProductionRate: " << productionRate << std::endl;
     std::cout << "Inventory:" << std::endl;
-    for (const auto& item : inventory) {
+    for (const auto& item : getInventory()) {
         std::cout << "  " << item.first << ": " << item.second << std::endl;
     }
 }
@@ -49,7 +45,7 @@ void Factory::simulate()
 }
 
 void Factory::produce(std::string product, int units) {
-    inventory[product] += units;
+    addToInventory(product, units); 
 }
 
 Factory::~Factory(){

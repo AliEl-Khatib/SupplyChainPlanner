@@ -7,6 +7,7 @@
 #include <thread>
 #include <string>
 #include "Message.h"
+#include <unordered_map>
 
 class Node {
 private:
@@ -19,6 +20,7 @@ private:
     std::condition_variable cv;
     std::thread simulationThread;
     std::vector<Node*> neighbors;
+    std::unordered_map<std::string, int> inventory;
 
 public:
     // constructor
@@ -29,6 +31,9 @@ public:
     std::string getName() const;
     std::string getLocation() const;
     std::vector<Node*> getNeighbors() const;
+    std::unordered_map<std::string, int> getInventory() const;
+    void addToInventory(std::string product, int units);
+    void takeFromInventory(std::string product, int units);
 
     bool getRunning() const;
 

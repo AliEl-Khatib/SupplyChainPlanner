@@ -26,6 +26,11 @@ std::unordered_map<std::string, Node*> SupplyChainNetwork::getNodes() const{
     return nodes;
 }
 
+std::unordered_map<std::string, Route *> SupplyChainNetwork::getRoutes() const
+{
+    return routes;
+}
+
 void SupplyChainNetwork::display() const{
     std::cout << "Nodes: " << std::endl;
     for (const auto& node : nodes) {

@@ -24,6 +24,21 @@ std::vector<Node *> Node::getNeighbors() const
     return neighbors;
 }
 
+std::unordered_map<std::string, int> Node::getInventory() const
+{
+    return inventory;
+}
+
+void Node::addToInventory(std::string product, int units)
+{
+    inventory[product] += units;
+}
+
+void Node::takeFromInventory(std::string product, int units)
+{
+    inventory[product] -= units;
+}
+
 bool Node::getRunning() const
 {
     return running;

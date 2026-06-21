@@ -6,12 +6,9 @@
 class Store : public Node {
 private:
     static int nextId;
-    std::unordered_map<std::string, int> inventory;
     std::unordered_map<std::string, int> demand;
 public:
     Store(std::string name, std::string location);
-    
-    std::unordered_map<std::string, int> getInventory() const;
     std::unordered_map<std::string, int> getDemand() const;
     bool checkInventory(std::string product, int units) const;
     bool placeOrder(std::string product, int units);

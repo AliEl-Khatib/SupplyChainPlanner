@@ -4,18 +4,16 @@
 
 Dijkstra::Dijkstra() {}
 
-void Dijkstra::run(SupplyChainNetwork& network, std::string sourceId) {
 
+nlohmann::json Dijkstra::runAndReturn(SupplyChainNetwork& network, std::string sourceId) {
     dist.clear();
     prev.clear();
     while (!pq.empty()) pq.pop();
 
-    // Get all nodes and set distance to infinity
     for (const auto& pair : network.getNodes()) {
         dist[pair.first] = std::numeric_limits<double>::infinity();
     }
 
-    // Source node distance is 0
     dist[sourceId] = 0.0;
     pq.push({0.0, sourceId});
 
@@ -23,14 +21,11 @@ void Dijkstra::run(SupplyChainNetwork& network, std::string sourceId) {
         auto [cost, nodeId] = pq.top();
         pq.pop();
 
-        // Skip if we already found a shorter path
         if (cost > dist[nodeId]) continue;
 
-        // Explore neighbors
         for (Route* route : network.getRoutesFrom(nodeId)) {
             std::string neighborId = route->getDestination()->getId();
             double newCost = dist[nodeId] + route->getCost();
-
             if (newCost < dist[neighborId]) {
                 dist[neighborId] = newCost;
                 prev[neighborId] = nodeId;
@@ -39,11 +34,38 @@ void Dijkstra::run(SupplyChainNetwork& network, std::string sourceId) {
         }
     }
 
-    // Print results
-    std::cout << "Shortest paths from " << sourceId << ":" << std::endl;
+    nlohmann::json result;
+    result["source"] = sourceId;
+    result["paths"] = nlohmann::json::array();
+
     for (const auto& pair : dist) {
-        std::cout << sourceId << " -> " << pair.first << " : " << pair.second << std::endl;
+        nlohmann::json path;
+        path["to"] = pair.first;
+        path["cost"] = pair.second == std::numeric_limits<double>::infinity() ? -1 : pair.second;
+        path["path"] = getPath(pair.first);
+        result["paths"].push_back(path);
     }
+
+    return result;
+}
+
+void Dijkstra::run(SupplyChainNetwork& network, std::string sourceId) {
+    nlohmann::json result = runAndReturn(network, sourceId);
+    std::cout << result.dump(4) << std::endl;
+}
+
+std::vector<std::string> Dijkstra::getPath(std::string destId) {
+    std::vector<std::string> path;
+    std::string current = destId;
+    
+    while (prev.count(current)) {
+        path.push_back(current);
+        current = prev[current];
+    }
+    path.push_back(current);
+    
+    std::reverse(path.begin(), path.end());
+    return path;
 }
 
 Dijkstra::~Dijkstra() {}
