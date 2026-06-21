@@ -1,0 +1,44 @@
+#ifndef NODE_H
+#define NODE_H
+
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
+#include <string>
+#include "Message.h"
+
+class Node {
+private:
+    std::string id;
+    std::string name;
+    std::string location;
+    bool running = false;
+    std::queue<Message> inbox;
+    std::mutex mtx;
+    std::condition_variable cv;
+    std::thread simulationThread;
+
+public:
+    // constructor
+    Node(std::string id, std::string name, std::string location);
+
+    // getters
+    std::string getId() const;
+    std::string getName() const;
+    std::string getLocation() const;
+
+    void sendMessage(Message msg);
+    Message receiveMessage();
+    virtual void simulate() = 0;
+    void startSimulation();
+    void stopSimulation();
+
+    // display info
+    virtual void display() const;
+
+    // virtual destructor
+    virtual ~Node();
+};
+
+#endif
