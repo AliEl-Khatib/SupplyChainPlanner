@@ -1,3 +1,0 @@
-/mnt/c/Users/elkha/proj/cpp/SupplyChainPlanner/backend/build/CMakeFiles/planner.dir
-/mnt/c/Users/elkha/proj/cpp/SupplyChainPlanner/backend/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/elkha/proj/cpp/SupplyChainPlanner/backend/build/CMakeFiles/rebuild_cache.dir
