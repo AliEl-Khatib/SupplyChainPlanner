@@ -19,6 +19,16 @@ std::string Node::getLocation() const {
     return location;
 }
 
+std::vector<Node *> Node::getNeighbors() const
+{
+    return neighbors;
+}
+
+bool Node::getRunning() const
+{
+    return running;
+}
+
 void Node::display() const {
     std::cout << "Id: " << id << "Name: " << name << "Location: " << location << std::endl;
 }
@@ -31,10 +41,15 @@ void Node::sendMessage(Message msg) {
 
 Message Node::receiveMessage() {
     std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [this] { return !inbox.empty(); });
+    cv.wait(lock, [this] { return !inbox.empty() || !running; });
+    if (!running) return Message{};
     Message msg = inbox.front();
     inbox.pop();
     return msg;
+}
+
+void Node::addNeighbor(Node* neighbor) {
+    neighbors.push_back(neighbor);
 }
 
 void Node::startSimulation() {
@@ -49,7 +64,11 @@ void Node::stopSimulation() {
 }
 
 Node::~Node() {
-
+    if (simulationThread.joinable()) {
+        running = false;
+        cv.notify_all();
+        simulationThread.join();
+    }
 }
 
 

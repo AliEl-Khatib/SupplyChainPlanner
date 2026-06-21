@@ -18,6 +18,7 @@ private:
     std::mutex mtx;
     std::condition_variable cv;
     std::thread simulationThread;
+    std::vector<Node*> neighbors;
 
 public:
     // constructor
@@ -27,12 +28,16 @@ public:
     std::string getId() const;
     std::string getName() const;
     std::string getLocation() const;
+    std::vector<Node*> getNeighbors() const;
+
+    bool getRunning() const;
 
     void sendMessage(Message msg);
     Message receiveMessage();
     virtual void simulate() = 0;
     void startSimulation();
     void stopSimulation();
+    void addNeighbor(Node* neighbor);
 
     // display info
     virtual void display() const;

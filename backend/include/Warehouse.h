@@ -13,9 +13,10 @@ class Warehouse : public Node {
         Warehouse(std::string name, int capacity, std::string location);
         int getCapacity() const;
         std::unordered_map<std::string, int> getInventory() const;
-        bool requestFromFactory(std::string factoryId, std::string product, int units);
+        bool requestFromFactory(std::string id, std::string product, int units);
         std::pair<std::string, int> sendToStore(std::string storeId, std::string product, int units);
         virtual void display() const override;
+        virtual void simulate() override;
         virtual ~Warehouse();
 };
 

@@ -1,5 +1,6 @@
 #include "Store.h"
 #include <iostream>
+#include <Warehouse.h>
 
 int Store::nextId = 1;
 
@@ -18,11 +19,21 @@ bool Store::checkInventory(std::string product, int units) const {
     return inventory.count(product) && inventory.at(product) >= units;
 }
 
-bool Store::placeOrder(std::string warehouseId, std::string product, int units) {
-    // For now just add to inventory
-    // Later SupplyChainNetwork will handle talking to the actual Warehouse
-    inventory[product] += units;
-    return true;
+bool Store::placeOrder(std::string product, int units) {
+    for (Node* neighbor : getNeighbors()) {
+        Warehouse* warehouse = dynamic_cast<Warehouse*>(neighbor);
+        if (warehouse != nullptr) {
+            Message msg;
+            msg.from = getId();
+            msg.to = warehouse->getId();
+            msg.product = product;
+            msg.units = units;
+            msg.type = "ORDER";
+            warehouse->sendMessage(msg);
+            return true;
+        }
+    }
+    return false;
 }
 
 void Store::display() const {
@@ -34,6 +45,27 @@ void Store::display() const {
     std::cout << "Demand:" << std::endl;
     for (const auto& item : demand) {
         std::cout << "  " << item.first << ": " << item.second << std::endl;
+    }
+}
+
+void Store::simulate()
+{
+    while (getRunning()) {
+        std::cout << "Store checking inventory" << std::endl;
+        for (const auto& [product, units] : demand) {
+            int inventoryUnits = inventory[product];
+            if (inventoryUnits < units) {
+                placeOrder(product, units - inventoryUnits);
+                Message shipment = receiveMessage();
+                if (!getRunning() && shipment.type.empty()) break;
+                if (shipment.type == "SHIPMENT") {
+                    inventory[shipment.product] += shipment.units;
+                }
+            } else {
+                inventory[product] -= units;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }
 

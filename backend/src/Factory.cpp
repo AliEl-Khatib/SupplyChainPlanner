@@ -1,5 +1,8 @@
 #include "Factory.h"
 #include <iostream>
+#include <chrono>
+#include <thread>
+
 
 int Factory::nextId = 1;
 
@@ -24,6 +27,24 @@ void Factory::display() const {
     std::cout << "Inventory:" << std::endl;
     for (const auto& item : inventory) {
         std::cout << "  " << item.first << ": " << item.second << std::endl;
+    }
+}
+
+void Factory::simulate()
+{
+    while (getRunning()) {
+        std::cout << "Factory producing widgets" << std::endl;
+        produce("widgets", 10);
+        Message msg;
+        msg.from = getId();
+        msg.product = "widgets";
+        msg.units = 10;
+        msg.type = "PRODUCE";
+        for (Node* neighbor : getNeighbors()) {
+            msg.to = neighbor->getId();
+            neighbor->sendMessage(msg);
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }
 

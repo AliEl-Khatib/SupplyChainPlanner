@@ -14,7 +14,7 @@ public:
     std::unordered_map<std::string, int> getInventory() const;
     std::unordered_map<std::string, int> getDemand() const;
     bool checkInventory(std::string product, int units) const;
-    bool placeOrder(std::string warehouseId, std::string product, int units);
+    bool placeOrder(std::string product, int units);
     void setDemand(std::string product, int units);
 
     virtual void display() const override;
